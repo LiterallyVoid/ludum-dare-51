@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="48"
+   height="48"
+   viewBox="0 0 48 48"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14, custom)"
+   sodipodi:docname="shotgun.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showgrid="true"
+     inkscape:zoom="8.0000004"
+     inkscape:cx="-4.9374998"
+     inkscape:cy="13.374999"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2138"
+       spacingx="1"
+       spacingy="1"
+       empspacing="8" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g10259">
+      <path
+         id="rect7306"
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:2;stroke-linejoin:round;paint-order:markers fill stroke"
+         d="M 24.707031,-0.04101562 7.7363281,16.929688 14.099609,23.292969 31.070312,6.3222656 Z M 33.193359,8.4433594 16.222656,25.414062 22.585938,31.777344 39.556641,14.806641 Z m 8.484375,8.4863286 -16.970703,16.970703 6.363281,6.363281 16.970704,-16.970703 z M 6.3222656,18.34375 2.0800781,22.585938 1.3730469,21.878906 -0.04101562,23.292969 7.7363281,31.070312 9.1503906,29.65625 8.4433594,28.949219 12.685547,24.707031 Z m 8.4843754,8.484375 -4.242188,4.242187 -0.7070311,-0.707031 -1.4140625,1.414063 7.7792966,7.779297 1.414063,-1.414063 -0.707031,-0.707031 4.242187,-4.242188 z m 8.486328,8.486328 -4.242188,4.242188 -0.707031,-0.707032 -1.414062,1.414063 7.777343,7.777344 1.414063,-1.414063 -0.707032,-0.707031 4.242188,-4.242188 z" />
+    </g>
+  </g>
+</svg>

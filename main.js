@@ -17,6 +17,8 @@ function initAudio() {
 		"rocket-explode",
 		"rocket-fire",
 		"sniper-attack",
+		"shotgun-fire",
+		"shotgun-mech",
 	]) {
 		sounds[name] = [];
 		for (let i = 0; i < 6; i++) {
@@ -201,20 +203,78 @@ const items = {
 			}
 		},
 	},
+	shotgun: {
+		icon: new Path2D("M 24.707031,-0.04101562 7.7363281,16.929688 14.099609,23.292969 31.070312,6.3222656 Z M 33.193359,8.4433594 16.222656,25.414062 22.585938,31.777344 39.556641,14.806641 Z m 8.484375,8.4863286 -16.970703,16.970703 6.363281,6.363281 16.970704,-16.970703 z M 6.3222656,18.34375 2.0800781,22.585938 1.3730469,21.878906 -0.04101562,23.292969 7.7363281,31.070312 9.1503906,29.65625 8.4433594,28.949219 12.685547,24.707031 Z m 8.4843754,8.484375 -4.242188,4.242187 -0.7070311,-0.707031 -1.4140625,1.414063 7.7792966,7.779297 1.414063,-1.414063 -0.707031,-0.707031 4.242187,-4.242188 z m 8.486328,8.486328 -4.242188,4.242188 -0.707031,-0.707032 -1.414062,1.414063 7.777343,7.777344 1.414063,-1.414063 -0.707032,-0.707031 4.242188,-4.242188 z"),
+		fgBlur: "#EA0",
+		fg: "#FE0",
+
+		fire(player) {
+			playSound("shotgun-fire", 0.4);
+			playSound("shotgun-mech", 0.7, 0.2);
+
+			let hasHit = new Set();
+
+			for (let i = 0; i < 12; i++) {
+				let angle = Math.random() * 0.4 - 0.2;
+				let s = Math.sin(angle);
+				let c = Math.cos(angle);
+
+				let direction = [
+					player.forward[0] * c - player.forward[1] * s,
+					player.forward[1] * c + player.forward[0] * s
+				];
+
+				let distance = 300.001;
+
+				for (const entity of player.game.traceRay(player.position, direction, 0.2)) {
+					if (entity[1].isEnemy && !hasHit.has(entity[1])) {
+						hasHit.add(entity[1]);
+						entity[1].dead = true;
+						player.game.score++;
+						distance = entity[0];
+						break;
+					}
+				}
+
+				{
+					let start = [player.position[0] * UNIT, player.position[1] * UNIT];
+					let end = [start[0] + direction[0] * distance * UNIT, start[1] + direction[1] * distance * UNIT];
+
+					let time = 0.15;
+
+					player.game.effects.push((delta) => {
+						ctx.save();
+						ctx.lineWidth = (time / 0.15) * 6;
+						ctx.strokeStyle = "#FA0";
+
+						ctx.beginPath();
+						ctx.moveTo(start[0], start[1]);
+						ctx.lineTo(end[0], end[1]);
+						ctx.stroke();
+						ctx.restore();
+
+						time -= delta;
+
+						return time > 0;
+					});
+				}
+			}
+		},
+	},
 };
 
 function effect_pop(entity) {
 	const particles = [];
 
 	for (let i = 0; i < 12; i++) {
-		particles.push([entity.position[0] * UNIT, entity.position[1] * UNIT, Math.random() * Math.PI * 2, Math.random() * 12]);
+		particles.push([entity.position[0] * UNIT, entity.position[1] * UNIT, Math.random() * Math.PI * 2, Math.random() * 1000]);
 	}
 
 	let time = 1;
 	return (delta) => {
 		for (const particle of particles) {
-			particle[0] += Math.cos(particle[2]) * particle[3];
-			particle[1] += Math.sin(particle[2]) * particle[3];
+			particle[0] += Math.cos(particle[2]) * particle[3] * delta;
+			particle[1] += Math.sin(particle[2]) * particle[3] * delta;
 
 			particle[3] *= Math.pow(0.5, delta * 20.0);
 
@@ -1203,7 +1263,7 @@ class Sacrifice extends Entity {
 		this.enemiesWithin = 0;
 		this.target = 4;
 
-		this.item = Math.random() < 0.5 ? "railgun" : "rocket";
+		this.item = Math.random() < 0.33333 ? "railgun" : Math.random() < 0.5 ? "shotgun" : "rocket";
 
 		this.success = false;
 	}
@@ -1368,7 +1428,7 @@ class Sacrifice extends Entity {
 
 class Game {
 	constructor() {
-		this.entities = [new Player(this)];
+		this.entities = [new Player(this), new WeaponPickup(this, "shotgun")];
 		this.arenaWidth = 80;
 		this.arenaHeight = 40;
 
