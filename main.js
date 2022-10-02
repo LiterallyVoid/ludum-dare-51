@@ -1,6 +1,8 @@
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 
+let ScaleFactor = 1;
+
 let audioCtx;
 
 const sounds = {
@@ -1352,8 +1354,8 @@ class Game {
 
 	update(delta) {
 		this.mousePosition = [
-			(mousePosition[0] - (canvas.width * 0.5)) / UNIT + this.camera[0],
-			(mousePosition[1] - (canvas.height * 0.5)) / UNIT + this.camera[1],
+			((mousePosition[0] - (canvas.width * 0.5)) / UNIT / ScaleFactor) + this.camera[0],
+			 ((mousePosition[1] - (canvas.height * 0.5)) / UNIT / ScaleFactor) + this.camera[1],
 		];
 
 		this.time = (this.time + delta) % 100;
@@ -1449,6 +1451,8 @@ class Game {
 
 		ctx.translate(canvas.width * 0.5, canvas.height * 0.5);
 
+		ctx.scale(ScaleFactor, ScaleFactor);
+
 		ctx.save();
 		ctx.scale(0.96, 0.96);
 
@@ -1532,6 +1536,8 @@ requestAnimationFrame(tick);
 window.onresize = () => {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
+
+	ScaleFactor = canvas.width / 1920;
 };
 
 window.onresize();
