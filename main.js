@@ -225,7 +225,7 @@ const items = {
 
 			let hasHit = new Set();
 
-			for (let i = 0; i < 12; i++) {
+			for (let i = 0; i < 7; i++) {
 				let angle = Math.random() * 0.4 - 0.2;
 				let s = Math.sin(angle);
 				let c = Math.cos(angle);
