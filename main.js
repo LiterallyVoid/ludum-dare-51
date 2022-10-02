@@ -45,6 +45,10 @@ function playSound(name, gain = 1.0, delay = 0.0) {
 		return;
 	}
 
+	if (!game || game.over) {
+		return;
+	}
+
 	let aud = sounds[name].pop();
 	if (!aud) return;
 
@@ -114,9 +118,10 @@ const items = {
 			playSound("railgun-2", 0.5);
 			playSound("railgun-3", 1, 0.05);
 
-			for (const entity of player.game.traceRay(player.position, player.forward, 1)) {
+			for (const entity of player.game.traceRay(player.position, player.forward, 1.5)) {
 				if (entity[1].isEnemy) {
 					entity[1].dead = true;
+					player.game.score++;
 				}
 			}
 
@@ -198,6 +203,41 @@ const items = {
 	},
 };
 
+function effect_pop(entity) {
+	const particles = [];
+
+	for (let i = 0; i < 12; i++) {
+		particles.push([entity.position[0] * UNIT, entity.position[1] * UNIT, Math.random() * Math.PI * 2, Math.random() * 12]);
+	}
+
+	let time = 1;
+	return (delta) => {
+		for (const particle of particles) {
+			particle[0] += Math.cos(particle[2]) * particle[3];
+			particle[1] += Math.sin(particle[2]) * particle[3];
+
+			particle[3] *= Math.pow(0.5, delta * 20.0);
+
+			ctx.fillStyle = "#00F";
+
+			ctx.save();
+			ctx.translate(particle[0], particle[1]);
+			ctx.rotate(particle[2]);
+
+			ctx.scale(1, 0.3);
+
+			ctx.beginPath();
+			ctx.arc(0, 0, 40 * Math.pow(time, 0.5), 0, Math.PI * 2);
+			ctx.fill();
+			ctx.restore();
+		}
+
+		time -= delta;
+
+		return time > 0;
+	};
+}
+
 class Entity {
 	constructor(game) {
 		this.game = game;
@@ -213,6 +253,8 @@ class Entity {
 		this.concussed = false;
 		this.concussionTimer = 0;
 	}
+
+	activateReaperMode() {}
 
 	grabbed() {
 		return this.game.player.grabbing === this;
@@ -261,7 +303,7 @@ class Entity {
 		ctx.fillStyle = "#204030";
 
 		ctx.beginPath();
-		ctx.arc(this.position[0] * UNIT, this.position[1] * UNIT, this.drawRadius * UNIT, this.drawRadius * UNIT, 0, Math.PI * 2);
+		ctx.arc(this.position[0] * UNIT, this.position[1] * UNIT, this.drawRadius * UNIT, 0, Math.PI * 2);
 		ctx.fill();
 	}
 
@@ -278,7 +320,7 @@ class Entity {
 			ctx.lineWidth = 1;
 
 			ctx.beginPath();
-			ctx.arc(this.position[0] * UNIT, this.position[1] * UNIT, this.radius * UNIT, this.radius * UNIT, 0, Math.PI * 2);
+			ctx.arc(this.position[0] * UNIT, this.position[1] * UNIT, this.radius * UNIT, 0, Math.PI * 2);
 			ctx.stroke();
 		}
 	}
@@ -382,7 +424,7 @@ class Rocket extends Entity {
 
 		this.game.effects.push(this.trail());
 
-		this.expradius = 6;
+		this.expradius = 8;
 
 		this.time = 2;
 	}
@@ -442,7 +484,7 @@ class Rocket extends Entity {
 				const sizeRatio = Math.pow(ratio, 0.1);
 
 				ctx.beginPath();
-				ctx.arc(particle[0], particle[1], particle[4] * sizeRatio, particle[4] * sizeRatio, 0, Math.PI * 2);
+				ctx.arc(particle[0], particle[1], particle[4] * sizeRatio, 0, Math.PI * 2);
 				ctx.fill();
 
 				particle[5] += delta * 3;
@@ -471,6 +513,7 @@ class Rocket extends Entity {
 		for (const entity of this.game.entities) {
 			if (entity.isEnemy && distance(entity.position, this.position) < this.expradius) {
 				entity.dead = true;
+				this.game.score++;
 			}
 		}
 
@@ -490,7 +533,7 @@ class Rocket extends Entity {
 			const size = 1.0 - Math.pow(0.5, time * 10.0);
 
 			ctx.beginPath();
-			ctx.arc(0, 0, (this.expradius - 1) * UNIT * size, (this.expradius - 1) * UNIT * size, 0, Math.PI * 2);
+			ctx.arc(0, 0, (this.expradius - 1) * UNIT * size, 0, Math.PI * 2);
 			ctx.stroke();
 
 			ctx.restore();
@@ -512,7 +555,7 @@ class Rocket extends Entity {
 		ctx.fillStyle = this.gradient;
 
 		ctx.beginPath();
-		ctx.arc(0, 0, 100, 100, 0, Math.PI * 2);
+		ctx.arc(0, 0, 100, 0, Math.PI * 2);
 		ctx.fill();
 
 		ctx.restore();
@@ -536,6 +579,9 @@ class Player extends Entity {
 		this.maxHealth = 6;
 
 		this.pipFlourish = [0, 0, 0, 0, 0, 0];
+
+		this.lastScore = 0;
+		this.scoreFlourish = 0;
 	}
 
 	damage(dmg) {
@@ -581,6 +627,28 @@ class Player extends Entity {
 		const border = 10;
 
 		ctx.translate(border, -border);
+
+		ctx.fillStyle = "#FF4";
+
+		ctx.textAlign = "left";
+		ctx.textBaseline = "bottom";
+
+		if (game.score !== this.lastScore) {
+			this.scoreFlourish = 1;
+			this.lastScore = game.score;
+		}
+
+		ctx.font = "italic 700 48px Saira, sans-serif";
+		ctx.fillText("SCORE: " + game.score, 20, -pipHeight - 5);
+
+		if (this.scoreFlourish > 0) {
+			ctx.lineWidth = Math.pow(this.scoreFlourish, 3) * 30;
+			ctx.strokeStyle = "#FFF";
+
+			ctx.strokeText("SCORE: " + game.score, 20, -pipHeight - 5);
+
+			this.scoreFlourish -= delta * 4;
+		}
 
 		ctx.shadowBlur = 6;
 		ctx.shadowColor = "#900";
@@ -727,7 +795,7 @@ class Player extends Entity {
 		ctx.fillStyle = "#3AF";
 
 		ctx.beginPath();
-		ctx.arc(this.position[0] * UNIT, this.position[1] * UNIT, this.drawRadius * UNIT, this.drawRadius * UNIT, 0, Math.PI * 2);
+		ctx.arc(this.position[0] * UNIT, this.position[1] * UNIT, this.drawRadius * UNIT, 0, Math.PI * 2);
 		ctx.fill();
 
 		super.draw();
@@ -746,7 +814,7 @@ class Player extends Entity {
 			ctx.translate(this.hover.position[0] * UNIT, this.hover.position[1] * UNIT);
 
 			ctx.beginPath();
-			ctx.arc(0, 0, this.hover.radius * UNIT, this.hover.radius * UNIT, 0, Math.PI * 2);
+			ctx.arc(0, 0, this.hover.radius * UNIT, 0, Math.PI * 2);
 			ctx.stroke();
 
 			ctx.restore();
@@ -890,6 +958,10 @@ class Swordsman extends Entity {
 		this.fast = Math.random() < 0.2;
 	}
 
+	activateReaperMode() {
+		this.game.effects.push(effect_pop(this));
+	}
+
 	update(delta) {
 		if (this.concussed) {
 			super.update(delta);
@@ -952,7 +1024,7 @@ class Swordsman extends Entity {
 		}
 
 		ctx.beginPath();
-		ctx.arc(this.position[0] * UNIT, this.position[1] * UNIT, this.drawRadius * UNIT, this.drawRadius * UNIT, 0, Math.PI * 2);
+		ctx.arc(this.position[0] * UNIT, this.position[1] * UNIT, this.drawRadius * UNIT, 0, Math.PI * 2);
 
 		ctx.fill();
 	}
@@ -1025,6 +1097,10 @@ class Sniper extends Entity {
 		this.forward = [0, 0];
 	}
 
+	activateReaperMode() {
+		this.game.effects.push(effect_pop(this));
+	}
+
 	update(delta) {
 		if (this.concussed) {
 			super.update(delta);
@@ -1088,7 +1164,7 @@ class Sniper extends Entity {
 		ctx.fillStyle = "#FF6622";
 
 		ctx.beginPath();
-		ctx.arc(this.position[0] * UNIT, this.position[1] * UNIT, this.drawRadius * UNIT, this.drawRadius * UNIT, 0, Math.PI * 2);
+		ctx.arc(this.position[0] * UNIT, this.position[1] * UNIT, this.drawRadius * UNIT, 0, Math.PI * 2);
 
 		ctx.fill();
 	}
@@ -1098,7 +1174,7 @@ class Sniper extends Entity {
 			ctx.save();
 
 			ctx.strokeStyle = "#F44";
-			ctx.lineWidth = 8;
+			ctx.lineWidth = Math.pow(1 - this.attackTimer, 3) * 8;
 
 			ctx.beginPath();
 			ctx.moveTo(this.position[0] * UNIT, this.position[1] * UNIT);
@@ -1174,7 +1250,7 @@ class Sacrifice extends Entity {
 					ctx.shadowBlur = 20;
 
 					ctx.beginPath();
-					ctx.arc(0, 0, size, size, 0, Math.PI * 2);
+					ctx.arc(0, 0, size, 0, Math.PI * 2);
 					ctx.stroke();
 
 					ctx.restore();
@@ -1234,7 +1310,7 @@ class Sacrifice extends Entity {
 		ctx.shadowBlur = 8;
 
 		ctx.beginPath();
-		ctx.arc(0, 0, this.radius * UNIT, this.radius * UNIT, 0, Math.PI * 2);
+		ctx.arc(0, 0, this.radius * UNIT, 0, Math.PI * 2);
 		ctx.stroke();
 
 		ctx.shadowBlur = 0;
@@ -1293,7 +1369,6 @@ class Sacrifice extends Entity {
 class Game {
 	constructor() {
 		this.entities = [new Player(this)];
-
 		this.arenaWidth = 80;
 		this.arenaHeight = 40;
 
@@ -1314,6 +1389,10 @@ class Game {
 
 		this.nextSacrifice = this.randomPosition();
 		this.spawnSacrifice();
+
+		this.score = 0;
+
+		this.Zoom = 1;
 	}
 
 	/// `direction` must be normalized!
@@ -1353,9 +1432,12 @@ class Game {
 	}
 
 	update(delta) {
+		const targetZoom = ScaleFactor;
+		this.Zoom = targetZoom;
+
 		this.mousePosition = [
-			((mousePosition[0] - (canvas.width * 0.5)) / UNIT / ScaleFactor) + this.camera[0],
-			 ((mousePosition[1] - (canvas.height * 0.5)) / UNIT / ScaleFactor) + this.camera[1],
+			((mousePosition[0] - (canvas.width * 0.5)) / UNIT / this.Zoom) + this.camera[0],
+			 ((mousePosition[1] - (canvas.height * 0.5)) / UNIT / this.Zoom) + this.camera[1],
 		];
 
 		this.time = (this.time + delta) % 100;
@@ -1372,6 +1454,7 @@ class Game {
 
 			entity.update(delta);
 			if (entity.dead) {
+				entity.activateReaperMode();
 				this.entities.splice(i, 1);
 				i--;
 			}
@@ -1381,7 +1464,7 @@ class Game {
 		this.camera[1] += (this.player.position[1] - this.camera[1]) * (1.0 - Math.pow(0.5, delta * 5.0));
 
 		if (this.enemyTimer < 0 && this.entities.length < 40) {
-			this.enemyTimer = Math.random() * 3 + 2;
+			this.enemyTimer = Math.random() * 2.5 + 1.8;
 
 			const pos = this.randomPosition();
 
@@ -1433,7 +1516,7 @@ class Game {
 
 				ctx.beginPath();
 
-				ctx.arc(this.nextSacrifice[0] * UNIT, this.nextSacrifice[1] * UNIT, size, size, 0, Math.PI * 2);
+				ctx.arc(this.nextSacrifice[0] * UNIT, this.nextSacrifice[1] * UNIT, size, 0, Math.PI * 2);
 
 				ctx.stroke();
 				ctx.restore();
@@ -1451,7 +1534,7 @@ class Game {
 
 		ctx.translate(canvas.width * 0.5, canvas.height * 0.5);
 
-		ctx.scale(ScaleFactor, ScaleFactor);
+		ctx.scale(this.Zoom, this.Zoom);
 
 		ctx.save();
 		ctx.scale(0.96, 0.96);
