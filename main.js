@@ -72,6 +72,17 @@ function playSound(name, gain = 1.0, delay = 0.0) {
 	}
 }
 
+function roundRect(x, y, w, h, r) {
+	ctx.beginPath();
+	ctx.rect(x + r, y, w - (r * 2), h);
+	ctx.rect(x, y + r, w, h - (r * 2));
+	ctx.arc(x + r, y + r, r, 0, Math.PI * 2);
+	ctx.arc(x + w - r, y + r, r, 0, Math.PI * 2);
+	ctx.arc(x + r, y + h - r, r, 0, Math.PI * 2);
+	ctx.arc(x + w - r, y + h - r, r, 0, Math.PI * 2);
+	ctx.fill();
+}
+
 const actionsPressed = {
 };
 
@@ -1611,11 +1622,22 @@ class Game {
 		ctx.translate(-this.camera[0] * UNIT, -this.camera[1] * UNIT);
 
 		ctx.fillStyle = "#407050";
-		ctx.fillRect(-this.arenaWidth / 2 * UNIT, -this.arenaHeight / 2 * UNIT, this.arenaWidth * UNIT, this.arenaHeight * UNIT);
+		roundRect(-this.arenaWidth / 2 * UNIT, -this.arenaHeight / 2 * UNIT, this.arenaWidth * UNIT, this.arenaHeight * UNIT, UNIT * 1.5);
 
 		for (const entity of this.entities) {
 			entity.drawShadow();
 		}
+
+		const GRIDSIZE = UNIT * 7;
+
+		ctx.fillStyle = "#00000044";
+
+		for (let x = -6; x <= 6; x++) {
+			for (let y = -4 + (x % 2 ? 1 : 0); y < 5; y += 2) {
+				ctx.fillRect(x * GRIDSIZE, y * GRIDSIZE, GRIDSIZE, GRIDSIZE);
+			}
+		}
+
 		ctx.restore();
 
 		ctx.translate(-this.camera[0] * UNIT, -this.camera[1] * UNIT);
