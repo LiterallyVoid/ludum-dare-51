@@ -229,6 +229,35 @@
 				color: #F44;
 				text-shadow: 2px 2px 4px #000;
 			}
+
+			#fullscreen {
+				position: absolute;
+				bottom: 1rem;
+				right: 1rem;
+
+				font-size: 1.2rem;
+
+				border: none;
+
+				padding: 0.2em 2em;
+
+				background-color: #3AF;
+				color: #FFF;
+
+				cursor: pointer;
+
+				font-family: "Saira", sans-serif;
+				font-weight: 700;
+				font-style: italic;
+
+				transform: scale(100%);
+			}
+
+			#fullscreen:hover {
+				transform: scale(110%);
+
+				transition: transform 0.1s ease;
+			}
 		</style>
 	</head>
 	<body>
@@ -242,6 +271,8 @@
 
 				<div id="buttons-sentinel"></div>
 			</div>
+
+			<button id="fullscreen">Fullscreen</button>
 		</div>
 		<div id="error-container" class="visible">
 			<div id="error">

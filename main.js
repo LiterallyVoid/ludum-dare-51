@@ -1977,3 +1977,19 @@ window.onblur = () => {
 };
 
 setMenuShown(true);
+
+document.querySelector("#fullscreen").addEventListener("click", async (e) => {
+	if (!document.fullscreenElement) {
+		document.documentElement.requestFullscreen();
+	} else {
+		document.exitFullscreen();
+	}
+});
+
+document.documentElement.addEventListener("fullscreenchange", () => {
+	if (document.fullscreenElement) {
+		document.querySelector("#fullscreen").textContent = "Exit Fullscreen";
+	} else {
+		document.querySelector("#fullscreen").textContent = "Fullscreen";
+	}
+});
