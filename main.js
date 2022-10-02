@@ -26,6 +26,8 @@ function initAudio() {
 			aud.src = "sounds/" + name + ".ogg";
 			aud.preload = "auto";
 
+			aud.crossOrigin = "";
+
 			document.body.appendChild(aud);
 
 			const source = new MediaElementAudioSourceNode(audioCtx, { mediaElement: aud });
