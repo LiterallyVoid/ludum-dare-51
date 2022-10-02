@@ -1,0 +1,262 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Ludum Dare 51</title>
+		<style>
+			/* Saira is licensed under the OFL. A copy of the license can be found at /fonts/OFL.txt */
+			@font-face {
+				font-family: "Saira";
+				src: url("/fonts/saira_italic.woff2") format("woff2");
+
+				font-style: italic;
+			}
+
+			@font-face {
+				font-family: "Saira";
+				src: url("/fonts/saira_medium.woff2") format("woff2");
+
+				font-weight: 500;
+			}
+
+			@font-face {
+				font-family: "Saira";
+				src: url("/fonts/saira_bolditalic.woff2") format("woff2");
+
+				font-style: italic;
+				font-weight: bold;
+			}
+
+			@font-face {
+				font-family: "Saira";
+				src: url("/fonts/saira_black.woff2") format("woff2");
+
+				font-weight: 900;
+			}
+
+			body {
+				overflow: hidden;
+			}
+
+			* {
+				font-family: "Saira", sans-serif;
+			}
+
+			.menu__title {
+				font-style: italic;
+				font-weight: bold;
+				font-size: 160%;
+				text-align: center;
+			}
+
+			canvas {
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
+
+			#menu {
+				position: absolute;
+				top: 0;
+				left: 0;
+				bottom: 0;
+				right: 0;
+
+				background-color: rgba(0, 0, 0, 0.2);
+
+				display: none;
+			}
+
+			#menu__inner {
+				position: absolute;
+				top: 0;
+				left: 0;
+				bottom: 0;
+				right: 0;
+
+				align-items: stretch;
+				justify-content: center;
+
+				flex-direction: column;
+
+				font-size: 2rem;
+				color: #FFF;
+
+				max-width: 16em;
+
+				margin: auto;
+
+				display: flex;
+			}
+
+			#menu.menu--visible {
+				display: block;
+			}
+
+			.menu__row {
+				flex-basis: 2em;
+			}
+
+			.menu__bindings {
+				display: flex;
+
+				flex-direction: column;
+
+				align-items: stretch;
+			}
+
+			.menu__binding-row {
+				display: flex;
+				flex-direction: row;
+				justify-content: stretch;
+
+				gap: 0.5em;
+
+				margin-top: 6px;
+				height: 1.2em;
+			}
+
+			.menu__bind {
+				background-color: #FFF;
+				color: #000;
+				border: none;
+
+				font-size: inherit;
+
+				cursor: pointer;
+
+				outline: 10px solid transparent;
+				outline-offset: 0px;
+
+				font-size: 20px;
+				font-style: italic;
+				font-weight: bold;
+
+				flex: 1;
+			}
+
+			.menu__bind:active, .menu__bind:focus {
+				outline: 5px solid #3AF;
+				outline-offset: 0px;
+				z-index: 1;
+
+				transition: outline 0.2s ease, outline-offset 0.2s ease;
+			}
+
+			.menu__binding-label {
+				font-size: 20px;
+
+				font-style: italic;
+				font-weight: normal;
+
+				text-align: right;
+
+				flex: 1;
+			}
+
+			.menu__button {
+				font-size: 120%;
+				border: none;
+				padding: 0.1em 0.1em;
+				margin: 0em 0em;
+
+				margin-top: 0.4em;
+
+				color: #FFF;
+
+				cursor: pointer;
+
+				font-style: italic;
+				font-weight: bold;
+
+				transition: transform 0.15s ease;
+
+				transform: scale(100%);
+			}
+
+			.menu__button:hover {
+				transform: scale(110%);
+			}
+
+			.menu__button:active {
+				transform: scale(105%);
+				transition: transform 0s ease;
+			}
+
+			.menu__button--primary {
+				background-color: #3AF;
+			}
+
+			.menu__button--danger {
+				background-color: #F44;
+			}
+
+			#error-container {
+				display: none;
+			}
+
+			#error-container.visible {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				margin: auto;
+				text-align: center;
+				background: rgba(0, 0, 0, 90%);
+				color: #F44;
+
+				font-family: "Saira", sans-serif;
+				font-weight: 500;
+
+				font-size: 1.5rem;
+			}
+
+			#error {
+				flex: 1;
+			}
+
+			#menu__death {
+				text-align: center;
+				font-size: 3rem;
+				font-family: "Saira", sans-serif;
+				font-weight: 900;
+
+				color: #F44;
+				text-shadow: 2px 2px 4px #000;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas width="640" height="480"></canvas>
+		<div id="menu">
+			<div id="menu__inner">
+				<div id="menu__death">FUCK</div>
+				<div class="menu__row menu__title">Sacrifice Golf</div>
+				<div class="menu__bindings">
+				</div>
+
+				<div id="buttons-sentinel"></div>
+			</div>
+		</div>
+		<div id="error-container" class="visible">
+			<div id="error">
+				ERROR: Javascript could not be executed.
+			</div>
+		</div>
+		<script src="main.js" type="module"></script>
+		<script>
+			document.querySelector("#error-container").className = "";
+			window.onerror = function(msg, url, linenumber) {
+				document.querySelector("#error-container").className = "visible";
+				document.querySelector("#error").textContent = "ERROR: " + msg + " (" + url + ":" + linenumber + ")";
+
+				return true;
+			};
+		</script>
+	</body>
+</html>
