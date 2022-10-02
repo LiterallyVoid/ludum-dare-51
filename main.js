@@ -1147,7 +1147,7 @@ class Sniper extends Entity {
 		this.radius = 1;
 		this.drawRadius = 0.5;
 
-		this.attackTimer = 0;
+		this.attackTimer = Math.random() * -4;
 
 		this.isEnemy = true;
 
@@ -1275,8 +1275,8 @@ class Sacrifice extends Entity {
 		}
 
 		if (other.isEnemy && other.concussed && !other.grabbed()) {
-			other.velocity[0] *= Math.pow(0.5, delta * 15.0);
-			other.velocity[1] *= Math.pow(0.5, delta * 15.0);
+			other.velocity[0] *= Math.pow(0.5, delta * 8.0);
+			other.velocity[1] *= Math.pow(0.5, delta * 8.0);
 		}
 
 		super.collide(delta, other);
@@ -1428,7 +1428,7 @@ class Sacrifice extends Entity {
 
 class Game {
 	constructor() {
-		this.entities = [new Player(this), new WeaponPickup(this, "shotgun")];
+		this.entities = [new Player(this)];
 		this.arenaWidth = 80;
 		this.arenaHeight = 40;
 
@@ -1550,7 +1550,16 @@ class Game {
 	}
 
 	randomPosition() {
-		return [Math.random() * this.arenaWidth - (this.arenaWidth / 2), Math.random() * this.arenaHeight - (this.arenaHeight / 2)];
+		let point = this.player.position;
+
+		while (distance(point, this.player.position) < 7) {
+			point = [
+				Math.random() * this.arenaWidth - (this.arenaWidth / 2),
+				Math.random() * this.arenaHeight - (this.arenaHeight / 2)
+			];
+		}
+
+		return point;
 	}
 
 	spawnSacrifice() {
