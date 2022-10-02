@@ -1447,7 +1447,7 @@ class Game {
 
 		this.enemyTimer = 0;
 
-		this.nextSacrifice = this.randomPosition();
+		this.nextSacrifice = [0, -7];
 		this.spawnSacrifice();
 
 		this.score = 0;
